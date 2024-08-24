@@ -31,7 +31,7 @@ To run the app locally, follow these steps:
 3. Run the application:
 
 ```bash
-streamlit run app.py
+make run
 ```
 
 ## Usage
@@ -49,6 +49,8 @@ streamlit run app.py
 The app will display the optimal configuration or inform you if no valid configuration is found within the constraints.
 
 ## Example
+
+Play on website: https://panupong-develop-solar-panel.streamlit.app
 
 Let's assume the following inputs:
 
