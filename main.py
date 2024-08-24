@@ -108,7 +108,7 @@ def optimize(panels, max_voltage, max_current, max_power) -> Optimized | None:
 
 # Streamlit UI
 st.title("Optimize Solar Panel Configuration")
-
+st.text("Finds the best series-parallel combination to maximize power output while staying within the user-defined system constraints.")
 st.subheader("Enter System Constraints")
 max_voltage = st.number_input("Max System Voltage (V)", min_value=1, step=1, value=50)
 max_current = st.number_input("Max System Current (A)", min_value=1, step=1, value=30)
