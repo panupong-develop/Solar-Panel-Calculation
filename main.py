@@ -3,8 +3,11 @@ import streamlit as st
 from dataclasses import dataclass
 
 
-@dataclass
-class Panel:
+class WithCalcPower:
+    """
+    A mixin class providing the `total_power` property 
+    to calculate power based on voltage and current.
+    """
     voltage: int
     current: int
     
@@ -13,18 +16,38 @@ class Panel:
         return self.voltage * self.current
 
 
+@dataclass
+class Panel(WithCalcPower):
+    """
+    Represents an individual solar panel with voltage and current
+    """
+    voltage: int
+    current: int
+
 MergedPanel = Panel
 PanelGroup = list[Panel]
 
 @dataclass
-class Output(Panel):
+class Output(WithCalcPower):
+    """
+    Represetns the system output
+    """
+    voltage: int
+    current: int
     num_series: int
     num_parallel: int
 
 @dataclass
-class Optimized(Output):
+class Optimized(WithCalcPower):
+    """
+    Represents the optimal system output
+    """
+    voltage: int
+    current: int
+    num_series: int
+    num_parallel: int
     loss_power: int
-    
+
 
 
 def group_panels(panels: list[Panel], chunk_size: int) -> list[PanelGroup]:
