@@ -15,13 +15,11 @@ class Panel:
 
 MergedPanel = Panel
 PanelGroup = list[Panel]
-MergeMethod = Literal["series_first", "parallel_first"]
 
 @dataclass
 class Output(Panel):
     num_series: int
     num_parallel: int
-    method: MergeMethod
 
 @dataclass
 class Optimized(Output):
@@ -45,44 +43,32 @@ def parallel_panels(panels: list[Panel]) -> MergedPanel:
     return Panel(v, i)
 
 
-def evaluate(panels: list[Panel], chunk_size: int, method: MergeMethod) -> Output:
+def evaluate(panels: list[Panel], chunk_size: int) -> Output:
     groups = group_panels(panels=panels, chunk_size=chunk_size)
-    
-    if method == "series_first":
-        series = [series_panels(panels) for panels in groups]
-        result = parallel_panels(series)
-        num_series = chunk_size
-        num_parallel = len(series)
-    else:
-        parallels = [parallel_panels(panels) for panels in groups]
-        result = series_panels(parallels)
-        num_series = len(parallels)
-        num_parallel = chunk_size
-        
+    series = [series_panels(panels) for panels in groups]
+    result = parallel_panels(series)
+    num_series = chunk_size
+    num_parallel = len(series)
 
     return Output(
         voltage=result.voltage,
         current=result.current,
         num_series=num_series,
         num_parallel=num_parallel,
-        method=method,
     )
 
 
 def optimize(panels, max_voltage, max_current, max_power) -> Optimized | None:
     best_config: Output | None = None
     best_power = 0
-    best_method = ""
 
     for group_size in range(1, len(panels) + 1):
-        for method in ("series_first", "parallel_first"):
-            output = evaluate(panels, group_size, method)
+        output: Output = evaluate(panels, group_size)
 
-            if output.voltage <= max_voltage and output.current <= max_current:
-                if output.total_power > best_power:
-                    best_power = output.total_power
-                    best_config = output
-                    best_method = method
+        if output.voltage <= max_voltage and output.current <= max_current:
+            if output.total_power > best_power:
+                best_power = output.total_power
+                best_config = output
 
     # cannot find the optimal point
     if best_config is None:
@@ -93,7 +79,6 @@ def optimize(panels, max_voltage, max_current, max_power) -> Optimized | None:
         current=best_config.current,
         num_series=best_config.num_series,
         num_parallel=best_config.num_parallel,
-        method=best_method,
         loss_power=max_power - best_config.total_power
     )
 
@@ -121,13 +106,7 @@ if st.button("Optimize Configuration"):
     
     else:
         st.write(f"**Best Configuration Found:**")
-        
-        st.write(f"Method {best_config.method}")
-        if best_config.method == "series_first":
-            st.write(f"Series: {best_config.num_series}/group ->  Parellel: {best_config.num_parallel}")
-        else:
-            st.write(f"Parellel: {best_config.num_parallel}/group -> Series: {best_config.num_series}")
-        
+        st.write(f"Series: {best_config.num_series}/group ->  Parellel: {best_config.num_parallel}")
         st.write(f"- Total Voltage: {best_config.voltage} V")
         st.write(f"- Total Current: {best_config.current} A")
         st.write(f"- Total Power: {best_config.total_power} W")
