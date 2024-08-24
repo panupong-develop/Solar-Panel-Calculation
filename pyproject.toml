@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "solaroptimize"
+version = "0.1.0"
+description = ""
+authors = ["panupong-puttarathamrongkul <54784627+panupong-puttarathamrongkul@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+streamlit = "^1.37.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
